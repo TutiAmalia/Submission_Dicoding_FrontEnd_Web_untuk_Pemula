@@ -1,29 +1,32 @@
-*{
+* {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
 }
 
-body, input, button {
+body,
+input,
+button {
     font-family: 'Open Sans', sans-serif;
 }
 
-body{
+body {
     background-color: white;
     /* font-family: Inter; */
 }
 
-header{
+header {
     top: 0;
     z-index: 5;
     /* background-color: #2c70d4; */
 }
 
-.header-container{
+.header-container {
     position: relative;
     height: 70px;
     max-width: 1100px;
-    margin: auto; /*usahakan max-width: px; margin:auto*/
+    margin: auto;
+    /*usahakan max-width: px; margin:auto*/
 
     display: flex;
     align-items: center;
@@ -32,15 +35,17 @@ header{
     color: white;
 }
 
-main{
+main {
     background: white;
 }
-.flex-box{
+
+.flex-box {
     display: flex;
     align-items: center;
-    
+
 }
-.main-section{
+
+.main-section {
     /* background-color: blueviolet; */
     /* flex-direction: column; */
     display: flex;
@@ -50,11 +55,11 @@ main{
     max-width: 100%;
     /* padding: 30px; */
     /* justify-content: space-between; */
-    
+
 }
 
-.add-book{
-    width: 50%;
+.add-book {
+    width: 40%;
     display: flex;
     flex-direction: column;
     padding: 50px;
@@ -68,43 +73,44 @@ main{
     /* padding: 20px 30px; */
 }
 
-.search-book{
-    width: 50%;
+.search-book {
+    width: 60%;
     display: flex;
     flex-direction: column;
-    padding: 50px;
+    padding: 50px 30px;
     /* margin: auto; */
     /* padding-left: 20px; */
     /* padding-right: 100px; */
-    
+
     gap: 18px;
     /* margin: auto; */
     /* padding: 20px 30px; */
 }
 
-.book-list{
+.book-list {
     border: solid 2px;
     border-color: rgba(221, 220, 220, 0.808);
     border-radius: 5px;
-    padding: 50px;
+    padding: 10px 20px;
     max-width: auto;
     display: flex;
-    flex-direction: colomn;
-    gap: 10px;
+    flex-direction: column;
+    gap: 3px;
     justify-content: space-between;
+
 }
 
-.form-input{
-    margin: 10px 0; 
-    width:100%; 
-    box-sizing: border-box; 
-    padding: 8px 20px; 
-    border: 2px solid rgba(221, 220, 220, 0.808); 
+.form-input {
+    margin: 10px 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 20px;
+    border: 2px solid rgba(221, 220, 220, 0.808);
     border-radius: 4px;
 }
 
-.form-input:focus{
-    border-color:#4010ad;
+.form-input:focus {
+    border-color: #4010ad;
     outline: 0;
 
 }
@@ -114,28 +120,102 @@ main{
     color: white;
     text-align: center;
     padding: 14px 20px;
-    background-color: #4d13d1; /* Green */
+    background-color: #4d13d1;
+    /* Green */
     border: 2px solid;
     border-radius: 5px;
     font-size: 15px;
-  }
-  
+}
+
 .button:hover {
-    background-color: #4010ad; /* Green */
+    background-color: #4010ad;
+    /* Green */
     color: white;
     border: 2px solid rgba(221, 220, 220, 0.808);
+    cursor: pointer;
 }
 
-form{
-    gap: 10px; 
-    display:flex; 
-    flex-direction:column
+form {
+    gap: 10px;
+    display: flex;
+    flex-direction: column
 }
 
-.search-icon{
+.search-icon {
     display: flex;
     cursor: pointer;
     position: relative;
     justify-content: right;
     align-items: center;
+}
+
+.sub-title {
+    display: flex;
+    flex-direction: row;
+    font-size: 13px;
+    column-gap: 15px;
+}
+
+.sub-title>p+p {
+    position: relative;
+}
+
+.sub-title>p+p::before {
+    content: "•";
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.fonts {
+    color: #370b9e;
+    font-weight: bold;
+}
+
+.checkbox {
+    accent-color: #4d13d1;
+}
+
+.icon-search {
+    width: 25px;
+    height: auto;
+    position: absolute;
+    margin: 5px
+}
+
+.list {
+    display: flex;
+    flex-direction: row;
+    border: 2px solid #fbf8f3;
+    border-radius: 4px;
+    background-color: #fbf8f3;
+    padding: 10px;
+    justify-content: space-between;
+}
+
+
+.list-style {
+    /* width: 80%; */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.book-title {
+    font-weight: bold;
+    color: rgb(82, 82, 82);
+    font-size: 15px;
+}
+
+.hero-icon {
+    width: 20px;
+    height: auto;
+    color: #4d13d1;
+    cursor: pointer;
+}
+
+.action-buttons {
+    display: flex;
+    column-gap: 8px;
+    justify-content: space-between;
 }
