@@ -9,11 +9,40 @@ const STORAGE_KEY = "bookshelf-app";
 
 document.addEventListener('DOMContentLoaded', function () {
     const submitForm = document.getElementById('form');
+    
+    // console.log(hasbookId);
     submitForm.addEventListener('submit', function (event) {
+        const hasbookId = submitForm.getAttribute('data-id');
         event.preventDefault();
-        addBook();
+        if (hasbookId){
+            updateBook(hasbookId);
+            submitForm.removeAttribute('data-id');
+        } else {
+            addBook();
+        }
     });
 })
+
+function updateBook(bookId){
+    const textBook = document.getElementById('title').value;
+    const authors = document.getElementById('author').value;
+    const years = document.getElementById('year').value;
+    const isCompleted = document.getElementById('check').checked;
+    
+    const book = books.find((book) => book.id == bookId);
+    book.title = textBook;
+    book.author = authors;
+    book.year = years;
+    book.isCompleted = isCompleted;
+    // console.log(book);
+
+    document.getElementById('title').value = '';
+    document.getElementById('author').value = '';
+    document.getElementById('year').value = '';
+    document.getElementById('check').checked = false;
+
+    document.dispatchEvent(new Event(RENDER_EVENT));
+}
 
 function addBook() {
     const textBook = document.getElementById('title').value;
@@ -29,7 +58,7 @@ function addBook() {
     document.getElementById('year').value = '';
     document.getElementById('check').checked = false;
 
-    console.log(books);
+    // console.log(books);
     document.dispatchEvent(new Event(RENDER_EVENT));
     //saveData();
 } //scope
@@ -57,6 +86,7 @@ document.addEventListener(RENDER_EVENT, function () {
 
     for (const bookItem of books) {
         const bookElement = makeList(bookItem);
+
         if (!bookItem.isCompleted) {
             uncompletedBookList.append(bookElement);
         } else {
@@ -101,7 +131,7 @@ function makeList(bookshelfObject) {
 
     but.undoButton.addEventListener('click', function () {
         editBookList(bookshelfObject.id);
-        // console.log(bookList);
+        // console.log('yok bisa yok!')
     });
 
     buttonList.append(but.undoButton);
@@ -156,7 +186,10 @@ function clickButton() {
     3. isi dari objek dikembalikan ke form
 */
 function editBookList(bookId) {
+
     const bookTarget = findBook(bookId);
+    // const bookTarget1 = findBookIndex(bookId);
+
 
     if (bookTarget == null) return;
 
@@ -164,12 +197,11 @@ function editBookList(bookId) {
     document.getElementById('author').value = bookTarget.author;
     document.getElementById('year').value = bookTarget.year;
     document.getElementById('check').checked = bookTarget.isCompleted;
-    //cek jika id sama maka
-    //update data baru dan hapus data lama
-    deleteBookFromList(bookTarget.id);
-
+   
+    const booksID = document.getElementById('form');
+    booksID.setAttribute('data-id', bookTarget.id);
+    // console.log(booksID);
     document.dispatchEvent(new Event(RENDER_EVENT));
-    // return bookTarget.id;
 }
 
 function moveBookFromList(bookId) {
@@ -212,6 +244,7 @@ function deleteBookFromList(bookId) {
 function findBookIndex(bookId) {
     for (const index in books) {
         if (books[index].id === bookId) {
+            
             return index;
         }
     }
