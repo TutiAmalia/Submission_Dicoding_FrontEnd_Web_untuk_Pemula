@@ -1,10 +1,10 @@
 const books = [];
 const RENDER_EVENT = "render-book";
-const SEARCHED_EVENT = "search-book";
-const EDIT_EVENT = "edit-book";
-const DELETED_EVENT = "delete-book";
-const SAVED_EVENT = "save-book";
-const STORAGE_KEY = "bookshelf-app";
+// const SEARCHED_EVENT = "search-book";
+// const EDIT_EVENT = "edit-book";
+// const DELETED_EVENT = "delete-book";
+// const SAVED_EVENT = "save-book";
+// const STORAGE_KEY = "bookshelf-app";
 
 
 document.addEventListener('DOMContentLoaded', function () {
