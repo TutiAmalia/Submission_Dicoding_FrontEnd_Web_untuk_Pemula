@@ -24,10 +24,15 @@ function addBook() {
     const generatedID = generatedId();
     const bookshelfObject = generateObject(generatedID, textBook, authors, years, isCompleted);
     books.push(bookshelfObject);
+    document.getElementById('title').value = '';
+    document.getElementById('author').value = '';
+    document.getElementById('year').value = '';
+    document.getElementById('check').checked = false;
 
+    console.log(books);
     document.dispatchEvent(new Event(RENDER_EVENT));
     //saveData();
-}
+} //scope
 
 function generatedId() {
     return +new Date();
@@ -71,22 +76,62 @@ function makeList(bookshelfObject) {
     bookTitle.classList.add('book-title');
     bookTitle.innerText = bookshelfObject.title;
 
+    const textContainer = document.createElement('div');
+    textContainer.classList.add('sub-title');
+
     const bookAuthors = document.createElement('p');
     bookAuthors.innerText = bookshelfObject.author;
 
     const bookYears = document.createElement('p');
     bookYears.innerText = bookshelfObject.year;
 
-    const textContainer = document.createElement('div');
-    textContainer.classList.add('sub-title');
     textContainer.append(bookAuthors, bookYears);
-
     listStyle.append(bookTitle, textContainer);
 
     const buttonList = document.createElement('div');
     buttonList.classList.add('action-buttons');
-    
 
+    const but = clickButton()
+
+    document.getElementById('changes').innerText = 'belum selesai dibaca';
+
+    bookList.append(listStyle);
+    bookList.append(buttonList);
+    bookList.setAttribute('id', `todo-${bookshelfObject.id}`);
+
+    but.undoButton.addEventListener('click', function () {
+        editBookList(bookshelfObject.id);
+        // console.log(bookList);
+    });
+
+    buttonList.append(but.undoButton);
+
+    but.saveButton.addEventListener('click', function () {
+        moveBookFromList(bookshelfObject.id);
+    });
+
+    buttonList.append(but.saveButton);
+
+    but.trashButton.addEventListener('click', function () {
+        deleteBookFromList(bookshelfObject.id);
+    });
+
+    buttonList.append(but.trashButton);
+    
+    return bookList;
+}
+
+document.getElementById('check').addEventListener('change', function () {
+    // console.log(this)
+    if (this.checked) {
+        document.getElementById('changes').innerText = 'selesai dibaca';
+    } else {
+        document.getElementById('changes').innerText = 'belum selesai dibaca';
+    }
+
+})
+
+function clickButton() {
     const undoButton = document.createElement('button');
     undoButton.classList.add('hero-icon');
     undoButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
@@ -99,73 +144,77 @@ function makeList(bookshelfObject) {
     trashButton.classList.add('hero-icon');
     trashButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
 
-    buttonList.append(undoButton, saveButton, trashButton);
-
-    bookList.append(listStyle);
-    bookList.append(buttonList);
-    bookList.setAttribute('id', `todo-${bookshelfObject.id}`);
-
-    if (bookshelfObject.isCompleted) {
-
-        undoButton.addEventListener('click', function () {
-            undoTaskFromCompleted(bookshelfObject.id);
-        });
-
-        buttonList.append(undoButton);
-        // }
-
-        // if (bookshelfObject.isCompleted) {
-        //     const undoButton = document.createElement('button');
-        //     undoButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none"
-        //         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        //         <path stroke-linecap="round" stroke-linejoin="round"
-        //             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        //     </svg>`
-        //     undoButton.getElementById('undo');
-
-        //     undoButton.addEventListener('click', function () {
-        //         undoTaskFromCompleted(bookshelfObject.id);
-        //     });
-
-        //     const saveButton = document.createElement('button');
-        //     saveButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none"
-        //     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        //     <path stroke-linecap="round" stroke-linejoin="round"
-        //         d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-        // </svg>`
-
-        //     // saveButton.addEventListener('click', function () {
-        //     //     saveTaskFromCompleted(bookshelfObject.id);
-        //     // });
-
-
-        //     // const trashButton = document.createElement('button');
-        //     // trashButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none"
-        //     // viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        //     // <path stroke-linecap="round" stroke-linejoin="round"
-        //     //     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`
-
-        //     // trashButton.addEventListener('click', function () {
-        //     //     removeTaskFromCompleted(bookshelfObject.id)
-        //     // })
-
-        //     // buttonList.append(undoButton, saveButton, trashButton);
-        //     buttonList.append(undoButton);
-        // } else {
-        //     const checkButton = document.createElement('button');
-        //     checkButton.classList.add('action-buttons');
-
-        //     checkButton.addEventListener('click', function () {
-        //         addBookToCompled(bookshelfObject.id)
-        //     });
-
-        //     bookList.append(checkButton);
+    return {
+        undoButton,
+        saveButton,
+        trashButton
     }
-    // // console.log(bookTitle);
-    // bookList.append(buttonList);
-    return bookList;
 }
 
-function addBookToCompled(bookId) {
+/*  1. Click edit button
+    2. panggil fungsi findBook untuk cek isi di dalam objeknya
+    3. isi dari objek dikembalikan ke form
+*/
+function editBookList(bookId) {
+    const bookTarget = findBook(bookId);
 
+    if (bookTarget == null) return;
+
+    document.getElementById('title').value = bookTarget.title;
+    document.getElementById('author').value = bookTarget.author;
+    document.getElementById('year').value = bookTarget.year;
+    document.getElementById('check').checked = bookTarget.isCompleted;
+    //cek jika id sama maka
+    //update data baru dan hapus data lama
+    deleteBookFromList(bookTarget.id);
+
+    document.dispatchEvent(new Event(RENDER_EVENT));
+    // return bookTarget.id;
+}
+
+function moveBookFromList(bookId) {
+    const bookTarget = findBook(bookId)
+
+    if (bookTarget == null) return;
+
+    if (bookTarget.isCompleted === true) {
+        bookTarget.isCompleted = false;
+    } else {
+        bookTarget.isCompleted = true;
+    }
+    document.dispatchEvent(new Event(RENDER_EVENT))
+
+    // saveData();
+
+}
+
+function findBook(bookId) {
+    for (const bookItem of books) {
+        if (bookItem.id === bookId) {
+            // console.log(bookItem);
+            return bookItem;
+        }
+    }
+
+    return null;
+}
+
+function deleteBookFromList(bookId) {
+    const bookTarget = findBookIndex(bookId);
+
+    if (bookTarget === -1) return;
+
+    books.splice(bookTarget, 1);
+    document.dispatchEvent(new Event(RENDER_EVENT));
+    // saveData();
+}
+
+function findBookIndex(bookId) {
+    for (const index in books) {
+        if (books[index].id === bookId) {
+            return index;
+        }
+    }
+
+    return -1;
 }
