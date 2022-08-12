@@ -1,34 +1,97 @@
 const books = [];
 const RENDER_EVENT = "render-book";
-// const SEARCHED_EVENT = "search-book";
+const SEARCHED_EVENT = "search-book";
 // const EDIT_EVENT = "edit-book";
 // const DELETED_EVENT = "delete-book";
-// const SAVED_EVENT = "save-book";
-// const STORAGE_KEY = "bookshelf-app";
+const SAVED_EVENT = "save-book";
+const STORAGE_KEY = "bookshelf-app";
 
 
 document.addEventListener('DOMContentLoaded', function () {
     const submitForm = document.getElementById('form');
-    
+
     // console.log(hasbookId);
     submitForm.addEventListener('submit', function (event) {
         const hasbookId = submitForm.getAttribute('data-id');
         event.preventDefault();
-        if (hasbookId){
+        if (hasbookId) {
             updateBook(hasbookId);
             submitForm.removeAttribute('data-id');
         } else {
             addBook();
         }
     });
-})
 
-function updateBook(bookId){
+    const searchForm = document.getElementById("search-form");
+    // console.log(searchForm);
+    searchForm.addEventListener("submit", (e) => {
+        document.getElementById("undo-btn");
+        e.preventDefault();
+        const query = e.target.querySelector("[name='query']").value
+        if (query) {
+            const filteredBooks = searchBook(query);
+            renderSearchResult(filteredBooks);
+        }
+    });
+
+    if (isStorageExist()) {
+        loadDataFromStorage();
+    }
+});
+
+document.addEventListener(SAVED_EVENT, function () {
+    localStorage.getItem(STORAGE_KEY);
+});
+
+function loadDataFromStorage() {
+    const serializedData = localStorage.getItem(STORAGE_KEY);
+    let data = JSON.parse(serializedData);
+
+    if (data !== null) {
+        for (const todo of data) {
+            books.push(todo);
+        }
+    }
+
+    document.dispatchEvent(new Event(RENDER_EVENT));
+}
+
+function renderSearchResult(filteredBooks) {
+    // const filteredBooks = books;
+    const uncompletedBookList = document.getElementById('uncompleted');
+    uncompletedBookList.innerHTML = '';
+
+    const completedBookList = document.getElementById('completed');
+    completedBookList.innerHTML = '';
+
+    // console.log(undoBtn);
+    for (const bookItem of filteredBooks) {
+        const bookElement = makeList(bookItem);
+
+        if (!bookItem.isCompleted) {
+            uncompletedBookList.append(bookElement);
+        } else {
+            completedBookList.append(bookElement);
+        }
+    }
+};
+
+function searchBook(query) {
+    const filteredBooks = books.filter((book) => {
+        return (
+            book.title.toLowerCase().includes(query.toLowerCase()) ||
+            book.author.toLowerCase().includes(query.toLowerCase())
+        );
+    });
+    return filteredBooks;
+}
+
+function updateBook(bookId) {
     const textBook = document.getElementById('title').value;
     const authors = document.getElementById('author').value;
     const years = document.getElementById('year').value;
     const isCompleted = document.getElementById('check').checked;
-    
+
     const book = books.find((book) => book.id == bookId);
     book.title = textBook;
     book.author = authors;
@@ -42,6 +105,7 @@ function updateBook(bookId){
     document.getElementById('check').checked = false;
 
     document.dispatchEvent(new Event(RENDER_EVENT));
+    saveData();
 }
 
 function addBook() {
@@ -60,7 +124,7 @@ function addBook() {
 
     // console.log(books);
     document.dispatchEvent(new Event(RENDER_EVENT));
-    //saveData();
+    saveData();
 } //scope
 
 function generatedId() {
@@ -135,19 +199,26 @@ function makeList(bookshelfObject) {
     });
 
     buttonList.append(but.undoButton);
-
-    but.saveButton.addEventListener('click', function () {
-        moveBookFromList(bookshelfObject.id);
-    });
-
-    buttonList.append(but.saveButton);
+    if (bookshelfObject.isCompleted) {
+        but.saveButton.addEventListener('click', function () {
+            moveBookFromList(bookshelfObject.id);
+            console.log(bookshelfObject.isCompleted);
+        });
+        buttonList.append(but.saveButton);
+    } else {
+        but.centangButton.addEventListener('click', function () {
+            moveBookFromList(bookshelfObject.id);
+            console.log(bookshelfObject.isCompleted);
+        });
+        buttonList.append(but.centangButton);
+    }
 
     but.trashButton.addEventListener('click', function () {
         deleteBookFromList(bookshelfObject.id);
     });
 
     buttonList.append(but.trashButton);
-    
+
     return bookList;
 }
 
@@ -166,6 +237,10 @@ function clickButton() {
     undoButton.classList.add('hero-icon');
     undoButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
 
+    const centangButton = document.createElement('button');
+    centangButton.classList.add('hero-icon');
+    centangButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+
     const saveButton = document.createElement('button');
     saveButton.classList.add('hero-icon');
     saveButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>';
@@ -176,15 +251,13 @@ function clickButton() {
 
     return {
         undoButton,
+        centangButton,
         saveButton,
         trashButton
     }
 }
 
-/*  1. Click edit button
-    2. panggil fungsi findBook untuk cek isi di dalam objeknya
-    3. isi dari objek dikembalikan ke form
-*/
+
 function editBookList(bookId) {
 
     const bookTarget = findBook(bookId);
@@ -197,11 +270,12 @@ function editBookList(bookId) {
     document.getElementById('author').value = bookTarget.author;
     document.getElementById('year').value = bookTarget.year;
     document.getElementById('check').checked = bookTarget.isCompleted;
-   
+
     const booksID = document.getElementById('form');
     booksID.setAttribute('data-id', bookTarget.id);
     // console.log(booksID);
     document.dispatchEvent(new Event(RENDER_EVENT));
+    // saveData();
 }
 
 function moveBookFromList(bookId) {
@@ -216,7 +290,7 @@ function moveBookFromList(bookId) {
     }
     document.dispatchEvent(new Event(RENDER_EVENT))
 
-    // saveData();
+    saveData();
 
 }
 
@@ -238,16 +312,32 @@ function deleteBookFromList(bookId) {
 
     books.splice(bookTarget, 1);
     document.dispatchEvent(new Event(RENDER_EVENT));
-    // saveData();
+    saveData();
 }
 
 function findBookIndex(bookId) {
     for (const index in books) {
         if (books[index].id === bookId) {
-            
+
             return index;
         }
     }
 
     return -1;
+}
+
+function saveData() {
+    if (isStorageExist()) {
+        const parsed = JSON.stringify(books);
+        localStorage.setItem(STORAGE_KEY, parsed);
+        document.dispatchEvent(new Event(SAVED_EVENT));
+    }
+}
+
+function isStorageExist() /* boolean */ {
+    if (typeof (Storage) === undefined) {
+        alert('Browser kamu tidak mendukung local storage');
+        return false;
+    }
+    return true;
 }

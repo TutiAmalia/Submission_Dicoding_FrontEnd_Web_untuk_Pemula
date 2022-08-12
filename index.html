@@ -27,7 +27,7 @@
         <!-- Main start -->
         <main class="flex-box">
             <section class="main-section">
-                <div class="add-book">
+                <aside class="add-book sticky">
                     <h2>Tambahkan Buku Baru</h2>
                     <form action="#" method="post" id="form">
                         <div>
@@ -47,21 +47,25 @@
                         </div>
                         <button class="button" type="submit" >Tambahkan buku sebagai <strong id="changes">belum selesai dibaca</strong></button>
                     </form>
-                </div>
+                </aside>
                 <div class="search-book">
                     <h2>Cari Buku</h2>
-                    <div>
+                    <form id="search-form">
                         <label for="search-title" class="fonts">Judul</label><br>
                         <div class="search-icon">
-                            <input type="text" class="form-input">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-search" fill="none" viewBox="0 0 24 24"
+                            <input type="text" class="form-input" name="query" >
+                            <button class="icon-search" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-
-                    </div>
+                                </svg>
+                            </button>
+                        </div> 
+                    </form>
+                    <!-- <div id="undo-btn"><svg xmlns="http://www.w3.org/2000/svg" class="undo" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
+                      </svg></div> -->
                     <span class="fonts">Belum selesai dibaca</span>
                     <div class="book-list" id="uncompleted">
                         <!-- <hr> -->
