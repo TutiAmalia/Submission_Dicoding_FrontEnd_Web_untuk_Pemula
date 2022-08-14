@@ -38,6 +38,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+document.addEventListener(RENDER_EVENT, function () {
+    const uncompletedBookList = document.getElementById('uncompleted');
+    uncompletedBookList.innerHTML = '';
+
+    const completedBookList = document.getElementById('completed');
+    completedBookList.innerHTML = '';
+    const completedBookLength = books.filter(book => book.isCompleted === true).length;
+    const uncompletedBookLength = books.filter(book => book.isCompleted === false).length;
+    if (completedBookLength == 0) { completedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
+    if (uncompletedBookLength == 0) { uncompletedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
+
+    for (const bookItem of books) {
+        const bookElement = makeList(bookItem);
+
+        if (!bookItem.isCompleted) {
+            uncompletedBookList.append(bookElement);
+        } else {
+            completedBookList.append(bookElement);
+        }
+    }
+});
+
+// Local Storage
 document.addEventListener(SAVED_EVENT, function () {
     localStorage.getItem(STORAGE_KEY);
 });
@@ -55,6 +78,7 @@ function loadDataFromStorage() {
     document.dispatchEvent(new Event(RENDER_EVENT));
 }
 
+// Merender Hasil Pencarian
 function renderSearchResult(filteredBooks, query) {
     const uncompletedBookList = document.getElementById('uncompleted');
     uncompletedBookList.innerHTML = '';
@@ -106,25 +130,12 @@ function searchBook(query) {
     return filteredBooks;
 }
 
-function updateBook(bookId) {
-    const textBook = document.getElementById('title').value;
-    const authors = document.getElementById('author').value;
-    const years = document.getElementById('year').value;
-    const isCompleted = document.getElementById('check').checked;
-
-    const book = books.find((book) => book.id == bookId);
-    book.title = textBook;
-    book.author = authors;
-    book.year = years;
-    book.isCompleted = isCompleted;
-
-    document.getElementById('title').value = '';
-    document.getElementById('author').value = '';
-    document.getElementById('year').value = '';
-    document.getElementById('check').checked = false;
-
-    document.dispatchEvent(new Event(RENDER_EVENT));
-    saveData();
+function isStorageExist() {
+    if (typeof (Storage) === undefined) {
+        alert('Browser kamu tidak mendukung local storage');
+        return false;
+    }
+    return true;
 }
 
 function addBook() {
@@ -136,10 +147,7 @@ function addBook() {
     const generatedID = generatedId();
     const bookshelfObject = generateObject(generatedID, textBook, authors, years, isCompleted);
     books.push(bookshelfObject);
-    document.getElementById('title').value = '';
-    document.getElementById('author').value = '';
-    document.getElementById('year').value = '';
-    document.getElementById('check').checked = false;
+    resetFromInput();
 
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
@@ -158,28 +166,6 @@ function generateObject(id, title, author, year, isCompleted) {
         isCompleted
     }
 }
-
-document.addEventListener(RENDER_EVENT, function () {
-    const uncompletedBookList = document.getElementById('uncompleted');
-    uncompletedBookList.innerHTML = '';
-
-    const completedBookList = document.getElementById('completed');
-    completedBookList.innerHTML = '';
-    const completedBookLength = books.filter(book => book.isCompleted === true).length;
-    const uncompletedBookLength = books.filter(book => book.isCompleted === false).length;
-    if (completedBookLength == 0) { completedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
-    if (uncompletedBookLength == 0) { uncompletedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
-
-    for (const bookItem of books) {
-        const bookElement = makeList(bookItem);
-
-        if (!bookItem.isCompleted) {
-            uncompletedBookList.append(bookElement);
-        } else {
-            completedBookList.append(bookElement);
-        }
-    }
-});
 
 function makeList(bookshelfObject) {
     const bookList = document.createElement('div');
@@ -243,45 +229,27 @@ function makeList(bookshelfObject) {
     return bookList;
 }
 
-document.getElementById('check').addEventListener('change', function () {
-    if (this.checked) {
-        document.getElementById('changes').innerText = 'selesai dibaca';
-    } else {
-        document.getElementById('changes').innerText = 'belum selesai dibaca';
-    }
+function updateBook(bookId) {
+    const textBook = document.getElementById('title').value;
+    const authors = document.getElementById('author').value;
+    const years = document.getElementById('year').value;
+    const isCompleted = document.getElementById('check').checked;
 
-})
+    const book = books.find((book) => book.id == bookId);
+    book.title = textBook;
+    book.author = authors;
+    book.year = years;
+    book.isCompleted = isCompleted;
 
-function clickButton() {
-    const undoButton = document.createElement('button');
-    undoButton.classList.add('hero-icon');
-    undoButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
+    resetFromInput();
 
-    const centangButton = document.createElement('button');
-    centangButton.classList.add('hero-icon');
-    centangButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
-
-    const saveButton = document.createElement('button');
-    saveButton.classList.add('hero-icon');
-    saveButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>';
-
-    const trashButton = document.createElement('button');
-    trashButton.classList.add('hero-icon');
-    trashButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
-
-    return {
-        undoButton,
-        centangButton,
-        saveButton,
-        trashButton
-    }
+    document.dispatchEvent(new Event(RENDER_EVENT));
+    saveData();
 }
-
 
 function editBookList(bookId) {
 
     const bookTarget = findBook(bookId);
-
 
     if (bookTarget == null) return;
 
@@ -311,6 +279,17 @@ function moveBookFromList(bookId) {
 
 }
 
+function deleteBookFromList(bookId) {
+    const bookTarget = findBookIndex(bookId);
+
+    if (bookTarget === -1) return;
+
+    books.splice(bookTarget, 1);
+    resetFromInput();
+    document.dispatchEvent(new Event(RENDER_EVENT));
+    saveData();
+}
+
 function findBook(bookId) {
     for (const bookItem of books) {
         if (bookItem.id === bookId) {
@@ -319,16 +298,6 @@ function findBook(bookId) {
     }
 
     return null;
-}
-
-function deleteBookFromList(bookId) {
-    const bookTarget = findBookIndex(bookId);
-
-    if (bookTarget === -1) return;
-
-    books.splice(bookTarget, 1);
-    document.dispatchEvent(new Event(RENDER_EVENT));
-    saveData();
 }
 
 function findBookIndex(bookId) {
@@ -342,6 +311,14 @@ function findBookIndex(bookId) {
     return -1;
 }
 
+function resetFromInput() {
+    document.getElementById('title').value = '';
+    document.getElementById('author').value = '';
+    document.getElementById('year').value = '';
+    document.getElementById('check').checked = false;
+}
+
+
 function saveData() {
     if (isStorageExist()) {
         const parsed = JSON.stringify(books);
@@ -350,10 +327,36 @@ function saveData() {
     }
 }
 
-function isStorageExist() {
-    if (typeof (Storage) === undefined) {
-        alert('Browser kamu tidak mendukung local storage');
-        return false;
+function clickButton() {
+    const undoButton = document.createElement('button');
+    undoButton.classList.add('hero-icon');
+    undoButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
+
+    const centangButton = document.createElement('button');
+    centangButton.classList.add('hero-icon');
+    centangButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+
+    const saveButton = document.createElement('button');
+    saveButton.classList.add('hero-icon');
+    saveButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>';
+
+    const trashButton = document.createElement('button');
+    trashButton.classList.add('hero-icon');
+    trashButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hero-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
+
+    return {
+        undoButton,
+        centangButton,
+        saveButton,
+        trashButton
     }
-    return true;
 }
+
+document.getElementById('check').addEventListener('change', function () {
+    if (this.checked) {
+        document.getElementById('changes').innerText = 'selesai dibaca';
+    } else {
+        document.getElementById('changes').innerText = 'belum selesai dibaca';
+    }
+
+});

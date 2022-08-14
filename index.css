@@ -50,6 +50,7 @@ main {
     background-color: #fbf8f3;
 }
 
+/* Membuat form input add book */
 .add-book {
     width: 40%;
     display: flex;
@@ -64,28 +65,10 @@ main {
     top: 0;
 }
 
-.search-book {
-    width: 60%;
-    display: flex; 
-    flex-direction: column;
-
-    padding: 50px 30px;
-    background-color: white;
-
-    gap: 18px;
-}
-
-.book-list {
-    border: solid 2px;
-    border-color: rgba(221, 220, 220, 0.808);
-    border-radius: 5px;
-    padding: 10px 20px;
-    max-width: auto;
+form {
+    gap: 10px;
     display: flex;
-    flex-direction: column;
-    gap: 3px;
-    justify-content: space-between;
-
+    flex-direction: column
 }
 
 .form-input {
@@ -101,6 +84,12 @@ main {
     border-color: #4010ad;
     outline: 0;
 
+}
+
+.checkbox {
+    accent-color: #4d13d1;
+    cursor: pointer;
+    margin-right: 8px;
 }
 
 .button {
@@ -121,10 +110,21 @@ main {
     cursor: pointer;
 }
 
-form {
-    gap: 10px;
-    display: flex;
-    flex-direction: column
+/* Membuat bagian searching */
+.search-book {
+    width: 60%;
+    display: flex; 
+    flex-direction: column;
+
+    padding: 50px 30px;
+    background-color: white;
+
+    gap: 18px;
+}
+
+.fonts {
+    color: #370b9e;
+    font-weight: bold;
 }
 
 .search-icon {
@@ -133,6 +133,47 @@ form {
     position: relative;
     justify-content: right;
     align-items: center;
+}
+
+.icon-search {
+    width: 25px;
+    height: auto;
+    position: absolute;
+    margin: 12px;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+/* --------------- */
+/* Membuat tampilan notif searching */
+.create {
+    display: flex; 
+    column-gap: 10px; 
+    align-items: center;
+}
+
+.reset{
+    background: none;
+    border: none;
+}
+
+.notification{ 
+    display: inline;
+}
+/* -------------- */
+
+/* Membuat tampilan bookshelf */
+.book-list {
+    border: solid 2px;
+    border-color: rgba(221, 220, 220, 0.808);
+    border-radius: 5px;
+    padding: 10px 20px;
+    max-width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: space-between;
+
 }
 
 .sub-title {
@@ -153,27 +194,6 @@ form {
     margin-right: 8px;
 }
 
-.fonts {
-    color: #370b9e;
-    font-weight: bold;
-}
-
-.checkbox {
-    accent-color: #4d13d1;
-    cursor: pointer;
-    margin-right: 8px;
-}
-
-.icon-search {
-    width: 25px;
-    height: auto;
-    position: absolute;
-    margin: 12px;
-    cursor: pointer;
-    border: none;
-    background: none;
-}
-
 .undo {
     width: 28px;
     height: auto;
@@ -184,17 +204,6 @@ form {
     border: none;
 }
 
-.reset{
-    background: none;
-    border: none;
-}
-
-.create {
-    display: flex; column-gap: 10px; align-items: center;
-}
-.notification{ 
-    display: inline;
-}
 .list {
     display: flex;
     flex-direction: row;
