@@ -10,7 +10,6 @@ const STORAGE_KEY = "bookshelf-app";
 document.addEventListener('DOMContentLoaded', function () {
     const submitForm = document.getElementById('form');
 
-    // console.log(hasbookId);
     submitForm.addEventListener('submit', function (event) {
         const hasbookId = submitForm.getAttribute('data-id');
         event.preventDefault();
@@ -23,15 +22,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const searchForm = document.getElementById("search-form");
-    // console.log(searchForm);
     searchForm.addEventListener("submit", (e) => {
         document.getElementById("undo-btn");
         e.preventDefault();
         const query = e.target.querySelector("[name='query']").value
         if (query) {
             const filteredBooks = searchBook(query);
-            renderSearchResult(filteredBooks);
+            renderSearchResult(filteredBooks, query);
         }
+
     });
 
     if (isStorageExist()) {
@@ -56,15 +55,35 @@ function loadDataFromStorage() {
     document.dispatchEvent(new Event(RENDER_EVENT));
 }
 
-function renderSearchResult(filteredBooks) {
-    // const filteredBooks = books;
+function renderSearchResult(filteredBooks, query) {
     const uncompletedBookList = document.getElementById('uncompleted');
     uncompletedBookList.innerHTML = '';
 
     const completedBookList = document.getElementById('completed');
     completedBookList.innerHTML = '';
 
-    // console.log(undoBtn);
+    const reset = document.getElementById('undo-btn');
+    reset.classList.add('undo');
+    reset.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" /></svg>'
+    
+    const notif = document.getElementById('notification');
+    notif.classList.add('notification');
+    notif.innerHTML = `Menampilkan buku dengan kata kunci <strong>${query}</strong>`;
+    
+    const completedBookLength = filteredBooks.filter(book => book.isCompleted === true).length;
+    const uncompletedBookLength = filteredBooks.filter(book => book.isCompleted === false).length;
+    
+    reset.addEventListener('click', function(){   
+        const query = document.querySelector("[name='query']");
+        query.value = '';
+        reset.innerHTML = '';
+        notif.innerHTML = '';
+        document.dispatchEvent(new Event(RENDER_EVENT));
+    })
+
+    if (completedBookLength == 0) { completedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
+    if (uncompletedBookLength == 0) { uncompletedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
+
     for (const bookItem of filteredBooks) {
         const bookElement = makeList(bookItem);
 
@@ -74,6 +93,7 @@ function renderSearchResult(filteredBooks) {
             completedBookList.append(bookElement);
         }
     }
+
 };
 
 function searchBook(query) {
@@ -97,7 +117,6 @@ function updateBook(bookId) {
     book.author = authors;
     book.year = years;
     book.isCompleted = isCompleted;
-    // console.log(book);
 
     document.getElementById('title').value = '';
     document.getElementById('author').value = '';
@@ -122,10 +141,9 @@ function addBook() {
     document.getElementById('year').value = '';
     document.getElementById('check').checked = false;
 
-    // console.log(books);
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
-} //scope
+} 
 
 function generatedId() {
     return +new Date();
@@ -147,6 +165,10 @@ document.addEventListener(RENDER_EVENT, function () {
 
     const completedBookList = document.getElementById('completed');
     completedBookList.innerHTML = '';
+    const completedBookLength = books.filter(book => book.isCompleted === true).length;
+    const uncompletedBookLength = books.filter(book => book.isCompleted === false).length;
+    if (completedBookLength == 0) { completedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
+    if (uncompletedBookLength == 0) { uncompletedBookList.innerHTML = '<p class="py-3 px-4 text-sm">Belum ada buku di rak ini</p>';}
 
     for (const bookItem of books) {
         const bookElement = makeList(bookItem);
@@ -195,7 +217,6 @@ function makeList(bookshelfObject) {
 
     but.undoButton.addEventListener('click', function () {
         editBookList(bookshelfObject.id);
-        // console.log('yok bisa yok!')
     });
 
     buttonList.append(but.undoButton);
@@ -223,7 +244,6 @@ function makeList(bookshelfObject) {
 }
 
 document.getElementById('check').addEventListener('change', function () {
-    // console.log(this)
     if (this.checked) {
         document.getElementById('changes').innerText = 'selesai dibaca';
     } else {
@@ -261,7 +281,6 @@ function clickButton() {
 function editBookList(bookId) {
 
     const bookTarget = findBook(bookId);
-    // const bookTarget1 = findBookIndex(bookId);
 
 
     if (bookTarget == null) return;
@@ -273,9 +292,7 @@ function editBookList(bookId) {
 
     const booksID = document.getElementById('form');
     booksID.setAttribute('data-id', bookTarget.id);
-    // console.log(booksID);
     document.dispatchEvent(new Event(RENDER_EVENT));
-    // saveData();
 }
 
 function moveBookFromList(bookId) {
@@ -297,7 +314,6 @@ function moveBookFromList(bookId) {
 function findBook(bookId) {
     for (const bookItem of books) {
         if (bookItem.id === bookId) {
-            // console.log(bookItem);
             return bookItem;
         }
     }
@@ -334,7 +350,7 @@ function saveData() {
     }
 }
 
-function isStorageExist() /* boolean */ {
+function isStorageExist() {
     if (typeof (Storage) === undefined) {
         alert('Browser kamu tidak mendukung local storage');
         return false;
